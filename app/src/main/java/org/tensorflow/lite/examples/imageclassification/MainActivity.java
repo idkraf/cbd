@@ -16,6 +16,7 @@
 
 package org.tensorflow.lite.examples.imageclassification;
 
+import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
@@ -34,12 +35,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-            // Workaround for Android Q memory leak issue in IRequestFinishCallback$Stub.
-            // (https://issuetracker.google.com/issues/139738913)
-            finishAfterTransition();
-        } else {
-            super.onBackPressed();
+        FragmentManager fm = getFragmentManager();
+        if(fm.getBackStackEntryCount() > 0){
+            fm.popBackStack();
+        }else{
+
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                // Workaround for Android Q memory leak issue in IRequestFinishCallback$Stub.
+                // (https://issuetracker.google.com/issues/139738913)
+                finishAfterTransition();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 }

@@ -24,6 +24,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.camera.core.AspectRatio;
@@ -66,6 +68,11 @@ public class CameraFragment extends Fragment
      */
     private ExecutorService cameraExecutor;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -73,6 +80,19 @@ public class CameraFragment extends Fragment
                              @Nullable Bundle savedInstanceState) {
         fragmentCameraBinding = FragmentCameraBinding
                 .inflate(inflater, container, false);
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button event
+
+                Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                        .navigate(CameraFragmentDirections.actionCameraToMain());
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
         return fragmentCameraBinding.getRoot();
     }
 
