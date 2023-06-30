@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/main_fragment">
 
@@ -8,13 +9,16 @@
         android:id="@+id/main_fragment"
         android:name="org.tensorflow.lite.examples.imageclassification.fragments.MainFragment"
         android:label="MainFragment" >
-
         <action
-            android:id="@+id/action_main_fragment_to_permissions_fragment"
-            app:destination="@id/permissions_fragment" />
+            android:id="@+id/action_main_fragment_to_camera_fragment"
+            app:destination="@id/camera_fragment"
+            app:popUpTo="@id/main_fragment"
+            app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_main_fragment_to_permissionsGaleriFragment"
-            app:destination="@id/permissions_galeri" />
+            android:id="@+id/action_main_fragment_to_artikelFragment"
+            app:destination="@id/artikelFragment"
+            app:popUpTo="@id/main_fragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
     <fragment
@@ -41,33 +45,10 @@
             app:popUpTo="@id/camera_fragment"
             app:popUpToInclusive="true" />
 
-        <action
-            android:id="@+id/action_camera_to_main"
-            app:destination="@id/main_fragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/permissions_galeri"
-        android:name="org.tensorflow.lite.examples.imageclassification.fragments.PermissionsGaleriFragment"
-        android:label="PermissionsGaleriFragment" >
-        <action
-            android:id="@+id/permissions_to_galeri"
-            app:destination="@id/galeri_fragment"
-            app:popUpTo="@id/permissions_galeri"
-            app:popUpToInclusive="true" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/galeri_fragment"
-        android:name="org.tensorflow.lite.examples.imageclassification.fragments.GaleriFragment"
-        android:label="GaleriFragment" >
-        <action
-            android:id="@+id/galeri_to_permissions"
-            app:destination="@id/permissions_galeri"
-            app:popUpTo="@id/galeri_fragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_galeri_to_main"
-            app:destination="@id/main_fragment" />
-    </fragment>
+        android:id="@+id/artikelFragment"
+        android:name="org.tensorflow.lite.examples.imageclassification.fragments.ArtikelFragment"
+        android:label="ArtikelFragment" />
 </navigation>

@@ -46,23 +46,26 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener {
     private int previousSelected = -1;
 
 
+    public GaleriFragment(){
+
+    }
+
+    public GaleriFragment(ArrayList<pictureFacer> allImages, int imagePosition, Context anim) {
+        this.allImages = allImages;
+        this.position = imagePosition;
+        this.animeContx = anim;
+    }
+
+    public static GaleriFragment newInstance(ArrayList<pictureFacer> allImages, int imagePosition, Context anim) {
+        GaleriFragment fragment = new GaleriFragment(allImages,imagePosition,anim);
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentGaleriBinding
                 .inflate(inflater, container, false);
-
-        // This callback will only be called when MyFragment is at least Started.
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
-            @Override
-            public void handleOnBackPressed() {
-                // Handle the back button event
-
-                Navigation.findNavController(requireActivity(), R.id.fragment_container)
-                        .navigate(GaleriFragmentDirections.actionGaleriToMain());
-            }
-        };
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
         return binding.getRoot();
     }
 

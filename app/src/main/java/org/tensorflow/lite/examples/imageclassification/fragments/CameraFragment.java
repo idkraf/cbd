@@ -81,18 +81,6 @@ public class CameraFragment extends Fragment
         fragmentCameraBinding = FragmentCameraBinding
                 .inflate(inflater, container, false);
 
-        // This callback will only be called when MyFragment is at least Started.
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
-            @Override
-            public void handleOnBackPressed() {
-                // Handle the back button event
-
-                Navigation.findNavController(requireActivity(), R.id.fragment_container)
-                        .navigate(CameraFragmentDirections.actionCameraToMain());
-            }
-        };
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
         return fragmentCameraBinding.getRoot();
     }
 

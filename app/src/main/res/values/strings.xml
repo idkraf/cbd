@@ -52,4 +52,9 @@
         <item>MobileNet V2</item>
         <item>EfficientNet Lite0</item>
     </string-array>
+
+    <string name="folderName">Folder Name</string>
+    <string name="empty">No Images on this device</string>
+
+    <string name="photos_name">Photos</string>
 </resources>
