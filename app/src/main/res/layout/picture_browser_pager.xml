@@ -9,4 +9,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/image" />
+
+    <Button
+        android:id="@+id/buttonRemove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="56dp"
+        android:background="@color/colorPrimary"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Remove Background"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/buttonDeteksi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="56dp"
+        android:background="@color/colorPrimaryDark"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Deteksi Sekarang"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
 </RelativeLayout>

@@ -51,6 +51,14 @@
                 android:name="android.notch_support"
                 android:value="true" />
         </activity>
+        <activity android:name=".CameraActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"/>
+        <activity android:name=".ArtikelActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"/>
         <activity android:name=".GalleryActivity"
             android:theme="@style/AppTheme"
             android:exported="true"

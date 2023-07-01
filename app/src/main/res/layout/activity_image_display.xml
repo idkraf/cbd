@@ -9,38 +9,21 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:ignore="ObsoleteLayoutParam">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/head"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:cardBackgroundColor="@color/skyblue">
-
-            <TextView
-                android:id="@+id/foldername"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|start"
-                android:text="@string/folderName"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp" />
-
-        </androidx.cardview.widget.CardView>
+            android:layout_height="wrap_content"/>
 
         <org.tensorflow.lite.examples.imageclassification.utils.AutoFitRecyclerView
-            android:layout_below="@id/head"
-            android:id="@+id/recycler"
+           android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/cardview_light_background"
-            android:columnWidth="@dimen/picture_column_width">
-
-        </org.tensorflow.lite.examples.imageclassification.utils.AutoFitRecyclerView>
-
+            android:layout_below="@id/toolbar"
+            android:columnWidth="@dimen/picture_column_width"/>
     </RelativeLayout>
 
 

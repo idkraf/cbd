@@ -8,11 +8,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class AutoFitRecyclerView extends RecyclerView {
-
     private int columnWidth = -1;
     private GridLayoutManager manager;
-
-
     public AutoFitRecyclerView(Context context) {
         super(context);
         initialize(context, null);
@@ -27,7 +24,6 @@ public class AutoFitRecyclerView extends RecyclerView {
         super(context, attrs, defStyle);
         initialize(context, attrs);
     }
-
 
     /**
      *

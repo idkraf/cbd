@@ -19,6 +19,8 @@ import android.widget.TextView;
 import android.view.Window;
 import android.view.WindowManager;
 
+import org.tensorflow.lite.examples.imageclassification.databinding.ActivityGalleryBinding;
+import org.tensorflow.lite.examples.imageclassification.databinding.ActivityImageDisplayBinding;
 import org.tensorflow.lite.examples.imageclassification.fragments.GaleriFragment;
 import org.tensorflow.lite.examples.imageclassification.utils.MarginDecoration;
 import org.tensorflow.lite.examples.imageclassification.utils.PicHolder;
@@ -29,35 +31,32 @@ import org.tensorflow.lite.examples.imageclassification.utils.picture_Adapter;
 import java.util.ArrayList;
 
 public class ImageDisplay extends AppCompatActivity implements itemClickListener {
-
-    RecyclerView imageRecycler;
+    ActivityImageDisplayBinding binding;
     ArrayList<pictureFacer> allpictures;
-    ProgressBar load;
     String foldePath;
-    TextView folderName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image_display);
-
-        folderName = findViewById(R.id.foldername);
-        folderName.setText(getIntent().getStringExtra("folderName"));
+        binding = ActivityImageDisplayBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        binding.toolbar.setTitle(getIntent().getStringExtra("folderName"));
+        setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         foldePath =  getIntent().getStringExtra("folderPath");
         allpictures = new ArrayList<>();
-        imageRecycler = findViewById(R.id.recycler);
-        imageRecycler.addItemDecoration(new MarginDecoration(this));
-        imageRecycler.hasFixedSize();
-        load = findViewById(R.id.loader);
-
+        //imageRecycler = findViewById(R.id.recycler);
+        binding.recycler.addItemDecoration(new MarginDecoration(this));
+        binding.recycler.hasFixedSize();
 
 
         if(allpictures.isEmpty()){
-            load.setVisibility(View.VISIBLE);
+            binding.loader.setVisibility(View.VISIBLE);
             allpictures = getAllImagesByFolder(foldePath);
-            imageRecycler.setAdapter(new picture_Adapter(allpictures,ImageDisplay.this,this));
-            load.setVisibility(View.GONE);
+            binding.recycler.setAdapter(new picture_Adapter(allpictures,ImageDisplay.this,this));
+            binding.loader.setVisibility(View.GONE);
         }
     }
 
@@ -132,4 +131,9 @@ public class ImageDisplay extends AppCompatActivity implements itemClickListener
         return images;
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 }

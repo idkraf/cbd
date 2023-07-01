@@ -48,13 +48,11 @@ public class GalleryActivity extends AppCompatActivity implements itemClickListe
         binding = ActivityGalleryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         verifyStoragePermissions(GalleryActivity.this);
-        //if(ContextCompat.checkSelfPermission(GalleryActivity.this,
-        //        Manifest.permission.READ_EXTERNAL_STORAGE)
-        //        != PackageManager.PERMISSION_GRANTED)
-        //    ActivityCompat.requestPermissions(GalleryActivity.this,
-        //            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-        //            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-        //____________________________________________________________________________________
+
+        binding.toolbar.setTitle("Photo Gallery");
+        setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         binding.folderRecycler.addItemDecoration(new MarginDecoration(this));
         binding.folderRecycler.hasFixedSize();
@@ -184,5 +182,11 @@ public class GalleryActivity extends AppCompatActivity implements itemClickListe
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(),R.color.black));
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

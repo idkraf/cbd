@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.AspectRatio;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -45,7 +47,10 @@ import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.tensorflow.lite.examples.imageclassification.CameraActivity;
 import org.tensorflow.lite.examples.imageclassification.ImageClassifierHelper;
+import org.tensorflow.lite.examples.imageclassification.MainActivity;
 import org.tensorflow.lite.examples.imageclassification.R;
 import org.tensorflow.lite.examples.imageclassification.databinding.FragmentCameraBinding;
 import org.tensorflow.lite.task.vision.classifier.Classifications;
@@ -71,6 +76,7 @@ public class CameraFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+      //  ((CameraActivity)getActivity()).pup
     }
 
     @Nullable
@@ -93,6 +99,17 @@ public class CameraFragment extends Fragment
                     .navigate(
                             CameraFragmentDirections.actionCameraToPermissions()
                     );
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        // Shut down our background executor
+        cameraExecutor.shutdown();
+        synchronized (task) {
+            imageClassifierHelper.clearImageClassifier();
         }
     }
 

@@ -57,4 +57,7 @@
     <string name="empty">No Images on this device</string>
 
     <string name="photos_name">Photos</string>
+    <string name="exit">Apakah kamu yakin ingin keluar dari aplikasi ini? </string>
+    <string name="yes">YA!</string>
+    <string name="no">TIDAK</string>
 </resources>
