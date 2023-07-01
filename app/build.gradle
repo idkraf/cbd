@@ -23,6 +23,26 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storePassword 'cbd@1234'
+            keyPassword 'cbd@1234'
+            keyAlias 'cbd'
+            storeFile file('D:\\cbd\\cbd.jks')
+        }
+        relase {
+            storeFile file('D:\\cbd\\cbd.jks')
+            storePassword 'cbd@1234'
+            keyPassword 'cbd@1234'
+            keyAlias 'cbd'
+        }
+
+       // Alias: cbd
+       // MD5: 0C:9E:F6:67:8E:37:A7:A9:85:69:29:B9:31:5D:91:F2
+       // SHA1: 2D:D2:99:A6:B4:D3:99:DD:A0:E6:87:BF:CD:58:F3:5F:87:5A:39:5A
+       // SHA-256: C0:34:DF:9C:D4:C4:B0:93:77:C4:E2:CA:5E:FB:AE:C3:65:AB:BD:6A:3F:48:66:C9:47:AC:1B:38:02:5F:A8:0C
+       // Valid until: Wednesday, June 24, 2048
+    }
     compileSdk 33
 
     defaultConfig {
@@ -33,6 +53,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.relase
     }
 
     buildTypes {
