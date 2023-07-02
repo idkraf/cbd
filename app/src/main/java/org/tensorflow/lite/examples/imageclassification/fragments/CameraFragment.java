@@ -48,9 +48,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.tensorflow.lite.examples.imageclassification.CameraActivity;
 import org.tensorflow.lite.examples.imageclassification.ImageClassifierHelper;
-import org.tensorflow.lite.examples.imageclassification.MainActivity;
 import org.tensorflow.lite.examples.imageclassification.R;
 import org.tensorflow.lite.examples.imageclassification.databinding.FragmentCameraBinding;
 import org.tensorflow.lite.task.vision.classifier.Classifications;
