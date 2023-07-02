@@ -19,34 +19,29 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.ImageAnalysis;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-
-import org.tensorflow.lite.examples.imageclassification.ImageClassifierHelper;
 import org.tensorflow.lite.examples.imageclassification.R;
 import org.tensorflow.lite.examples.imageclassification.databinding.FragmentGaleriBinding;
 import org.tensorflow.lite.examples.imageclassification.utils.BackgroundRemover;
-import org.tensorflow.lite.examples.imageclassification.utils.BitmapUtilsKt;
 import org.tensorflow.lite.examples.imageclassification.utils.OnBackgroundChangeListener;
 import org.tensorflow.lite.examples.imageclassification.utils.imageIndicatorListener;
 import org.tensorflow.lite.examples.imageclassification.utils.pictureFacer;
 import org.tensorflow.lite.examples.imageclassification.utils.recyclerViewPagerImageIndicator;
-import org.tensorflow.lite.task.vision.classifier.Classifications;
-//import androidx.core.graphics.drawable.toBitmap;
+
+
+import org.tensorflow.lite.DataType;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +50,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class GaleriFragment extends Fragment implements imageIndicatorListener, ImageClassifierHelper.ClassifierListener{
+import org.tensorflow.lite.examples.imageclassification.ml.Model;
+
+public class GaleriFragment extends Fragment implements imageIndicatorListener{
     private FragmentGaleriBinding binding;
 
     private  ArrayList<pictureFacer> allImages = new ArrayList<>();
@@ -67,12 +64,7 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener, 
     private int previousSelected = -1;
 
     private ImageView image;
-    private RecyclerView recyclerviewResults;
-    private Bitmap bitmapBuffer;
-    private ImageClassifierHelper imageClassifierHelper;
-    private ClassificationResultAdapter classificationResultsAdapter;
-    private ImageAnalysis imageAnalyzer;
-    private final Object task = new Object();
+    int imageSize = 224;
 
     public GaleriFragment(){
 
@@ -106,9 +98,6 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener, 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        synchronized (task) {
-            imageClassifierHelper.clearImageClassifier();
-        }
     }
 
     @Override
@@ -147,23 +136,7 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener, 
 
     }
 
-    @Override
-    public void onError(String error) {
 
-        requireActivity().runOnUiThread(() -> {
-            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
-            classificationResultsAdapter.updateResults(new ArrayList<>());
-        });
-    }
-
-    @Override
-    public void onResults(List<Classifications> results, long inferenceTime) {
-        requireActivity().runOnUiThread(() -> {
-            classificationResultsAdapter.updateResults(results.get(0).getCategories());
-            binding.bottomSheetLayout.inferenceTimeVal
-                    .setText(String.format(Locale.US, "%d ms", inferenceTime));
-        });
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -174,18 +147,6 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener, 
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        imageClassifierHelper = ImageClassifierHelper.create(requireContext()
-                , this);
-
-        // setup result adapter
-        classificationResultsAdapter = new ClassificationResultAdapter();
-        classificationResultsAdapter
-                .updateAdapterSize(imageClassifierHelper.getMaxResults());
-        binding.recyclerviewResultss
-                .setAdapter(classificationResultsAdapter);
-        binding.recyclerviewResultss
-                .setLayoutManager(new LinearLayoutManager(requireContext()));
-        initBottomSheetControls();
         /**
          * initialisation of the recyclerView visibility control integers
          */
@@ -236,10 +197,6 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener, 
 
 
                 }
-                synchronized (task) {
-                    imageClassifierHelper.clearImageClassifier();
-                    classificationResultsAdapter.updateResults(new ArrayList<>());
-                }
             }
 
             @Override
@@ -275,10 +232,6 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener, 
             binding.indicatorRecycler.getAdapter().notifyDataSetChanged();
         }else{
             previousSelected = ImagePosition;
-        }
-        synchronized (task) {
-            imageClassifierHelper.clearImageClassifier();
-            classificationResultsAdapter.updateResults(new ArrayList<>());
         }
 
         binding.imagePager.setCurrentItem(ImagePosition);
@@ -363,13 +316,13 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener, 
                 //image.invalidate();
                 image.buildDrawingCache();
                 Bitmap bitmap = image.getDrawingCache();
-                if (bitmapBuffer == null) {
-                    bitmapBuffer = Bitmap.createBitmap(
-                            image.getWidth(),
-                            image.getHeight(),
-                            Bitmap.Config.ARGB_8888);
+               //if (bitmapBuffer == null) {
+                 //   bitmapBuffer = Bitmap.createBitmap(
+                //           image.getWidth(),
+                 //           image.getHeight(),
+                //            Bitmap.Config.ARGB_8888);
                     classifyImage(bitmap);
-                }
+              //  }
             });
 
             ((ViewPager) containerCollection).addView(view);
@@ -388,146 +341,56 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener, 
     }
 
 
-    public void classifyImage(Bitmap image){
-        // Copy out RGB bits to the shared bitmap buffer
-        //bitmapBuffer.copyPixelsFromBuffer(image.getPlanes()[0].getBuffer());
-        int imageRotation = 0;
-        //image.close();
-        synchronized (task) {
-            // Pass Bitmap and rotation to the image classifier helper for
-            // processing and classification
-            imageClassifierHelper.classify(bitmapBuffer, imageRotation);
+    public  void classifyImage(Bitmap image){
+        try {
+            Model model = Model.newInstance(getApplicationContext());
+
+            // Creates inputs for reference.
+            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * imageSize * imageSize * 3);
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            int[] intValues = new int[imageSize * imageSize];
+            image.getPixels(intValues, 0, image.getWidth(), 0, 0, image.getWidth(), image.getHeight());
+            int pixel = 0;
+            //iterate over each pixel and extract R, G, and B values. Add those values individually to the byte buffer.
+            for(int i = 0; i < imageSize; i ++){
+                for(int j = 0; j < imageSize; j++){
+                    int val = intValues[pixel++]; // RGB
+                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat((val & 0xFF) * (1.f / 1));
+                }
+            }
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            Model.Outputs outputs = model.process(inputFeature0);
+            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+            float[] confidences = outputFeature0.getFloatArray();
+            // find the index of the class with the biggest confidence.
+            int maxPos = 0;
+            float maxConfidence = 0;
+            for (int i = 0; i < confidences.length; i++) {
+                if (confidences[i] > maxConfidence) {
+                    maxConfidence = confidences[i];
+                    maxPos = i;
+                }
+            }
+            String[] classes = {"DarkRoasting", "GreenRoasting", "LightRoasting","MediumRoasting"};
+            binding.result.setText(classes[maxPos]);
+
+            String s = "";
+            for(int i = 0; i < classes.length; i++ ){
+                s += String.format("%s : %.1f%%\n", classes[i], confidences[i] * 100);
+            }
+            binding.confidence.setText(s);
+            // Releases model resources if no longer used.
+            model.close();
+        } catch (IOException e) {
+            // TODO Handle the exception
         }
     }
-
-    // Update the values displayed in the bottom sheet. Reset classifier.
-    private void updateControlsUi() {
-        binding.bottomSheetLayout.maxResultsValue
-                .setText(String.valueOf(imageClassifierHelper.getMaxResults()));
-        binding.bottomSheetLayout.thresholdValue
-                .setText(String.format(Locale.US, "%.2f",
-                        imageClassifierHelper.getThreshold()));
-        binding.bottomSheetLayout.threadsValue
-                .setText(String.valueOf(imageClassifierHelper.getNumThreads()));
-        // Needs to be cleared instead of reinitialized because the GPU
-        // delegate needs to be initialized on the thread using it when
-        // applicable
-        synchronized (task) {
-            imageClassifierHelper.clearImageClassifier();
-        }
-    }
-
-    private void initBottomSheetControls() {
-        // When clicked, lower classification score threshold floor
-        binding.bottomSheetLayout.thresholdMinus
-                .setOnClickListener(view -> {
-                    float threshold = imageClassifierHelper.getThreshold();
-                    if (threshold >= 0.1) {
-                        imageClassifierHelper.setThreshold(threshold - 0.1f);
-                        updateControlsUi();
-                    }
-                });
-
-        // When clicked, raise classification score threshold floor
-        binding.bottomSheetLayout.thresholdPlus
-                .setOnClickListener(view -> {
-                    float threshold = imageClassifierHelper.getThreshold();
-                    if (threshold < 0.9) {
-                        imageClassifierHelper.setThreshold(threshold + 0.1f);
-                        updateControlsUi();
-                    }
-                });
-
-        // When clicked, reduce the number of objects that can be classified
-        // at a time
-        binding.bottomSheetLayout.maxResultsMinus
-                .setOnClickListener(view -> {
-                    int maxResults = imageClassifierHelper.getMaxResults();
-                    if (maxResults > 1) {
-                        imageClassifierHelper.setMaxResults(maxResults - 1);
-                        updateControlsUi();
-                        classificationResultsAdapter.updateAdapterSize(
-                                imageClassifierHelper.getMaxResults()
-                        );
-                    }
-                });
-
-        // When clicked, increase the number of objects that can be
-        // classified at a time
-        binding.bottomSheetLayout.maxResultsPlus
-                .setOnClickListener(view -> {
-                    int maxResults = imageClassifierHelper.getMaxResults();
-                    if (maxResults < 3) {
-                        imageClassifierHelper.setMaxResults(maxResults + 1);
-                        updateControlsUi();
-                        classificationResultsAdapter.updateAdapterSize(
-                                imageClassifierHelper.getMaxResults()
-                        );
-                    }
-                });
-
-        // When clicked, decrease the number of threads used for classification
-        binding.bottomSheetLayout.threadsMinus
-                .setOnClickListener(view -> {
-                    int numThreads = imageClassifierHelper.getNumThreads();
-                    if (numThreads > 1) {
-                        imageClassifierHelper.setNumThreads(numThreads - 1);
-                        updateControlsUi();
-                    }
-                });
-
-        // When clicked, increase the number of threads used for classification
-        binding.bottomSheetLayout.threadsPlus
-                .setOnClickListener(view -> {
-                    int numThreads = imageClassifierHelper.getNumThreads();
-                    if (numThreads < 4) {
-                        imageClassifierHelper.setNumThreads(numThreads + 1);
-                        updateControlsUi();
-                    }
-                });
-
-        // When clicked, change the underlying hardware used for inference.
-        // Current options are CPU,GPU, and NNAPI
-        binding.bottomSheetLayout.spinnerDelegate
-                .setSelection(0, false);
-        binding.bottomSheetLayout.spinnerDelegate
-                .setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView,
-                                               View view,
-                                               int position,
-                                               long id) {
-                        imageClassifierHelper.setCurrentDelegate(position);
-                        updateControlsUi();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-                        // no-op
-                    }
-                });
-
-        // When clicked, change the underlying model used for object
-        // classification
-        binding.bottomSheetLayout.spinnerModel
-                .setSelection(0, false);
-        binding.bottomSheetLayout.spinnerModel
-                .setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView,
-                                               View view,
-                                               int position,
-                                               long id) {
-                        imageClassifierHelper.setCurrentModel(position);
-                        updateControlsUi();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-                        // no-op
-                    }
-                });
-    }
-
 
 }
