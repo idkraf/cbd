@@ -69,6 +69,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        mlModelBinding true
     }
 
     androidResources {
@@ -130,4 +131,6 @@ dependencies {
 
     //ml-kit selfie segmentation
     implementation 'com.google.mlkit:segmentation-selfie:16.0.0-beta4'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
+    implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0'
 }
