@@ -59,6 +59,10 @@
             android:theme="@style/AppTheme"
             android:exported="true"
             android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"/>
+        <activity android:name=".GaleriActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"/>
         <activity android:name=".GalleryActivity"
             android:theme="@style/AppTheme"
             android:exported="true"

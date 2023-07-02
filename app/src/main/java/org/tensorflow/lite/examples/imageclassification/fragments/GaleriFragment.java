@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import org.tensorflow.lite.examples.imageclassification.GalleryActivity;
 import org.tensorflow.lite.examples.imageclassification.R;
 import org.tensorflow.lite.examples.imageclassification.databinding.FragmentGaleriBinding;
 import org.tensorflow.lite.examples.imageclassification.utils.BackgroundRemover;
@@ -318,13 +319,14 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener{
                 //image.invalidate();
                 image.buildDrawingCache();
                 Bitmap bitmap = image.getDrawingCache();
-               //if (bitmapBuffer == null) {
-                 //   bitmapBuffer = Bitmap.createBitmap(
-                //           image.getWidth(),
-                 //           image.getHeight(),
-                //            Bitmap.Config.ARGB_8888);
-                    classifyImage(bitmap);
-              //  }
+               if (bitmap != null) {
+                    //bitmap = Bitmap.createBitmap(
+                      //     image.getWidth(),
+                      //      image.getHeight(),
+                      //      Bitmap.Config.ARGB_8888);
+                   //bitmap = Bitmap.createScaledBitmap(bitmap, imageSize, imageSize, false);
+                    classifyImage(Bitmap.createScaledBitmap(bitmap, imageSize, imageSize, false));
+                }
             });
 
             ((ViewPager) containerCollection).addView(view);
@@ -341,8 +343,6 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener{
             return view == ((View) object);
         }
     }
-
-
     public  void classifyImage(Bitmap image){
         try {
             Model model = Model.newInstance(requireContext());
