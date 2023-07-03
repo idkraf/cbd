@@ -6,6 +6,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,6 +30,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import androidx.core.graphics.drawable.DrawableKt;
 
 import org.tensorflow.lite.examples.imageclassification.GalleryActivity;
 import org.tensorflow.lite.examples.imageclassification.R;
@@ -285,38 +289,37 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener{
 
 
             btnRemove.setOnClickListener(v->{
+                //drawableToBitmap(image, imageSize);
                 //image.invalidate();
                 //image.buildDrawingCache();
                 //Bitmap bmap = image.getDrawingCache();
-                Uri dat = Uri.fromFile(new File(pic.getPicturePath()));
-                Bitmap bmap = null;
+                //Uri dat = Uri.fromFile(new File(pic.getPicturePath()));
+                // Bitmap bmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getContext()).getContentResolver(), dat);
 
-                try {
-                    bmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getContext()).getContentResolver(), dat);
-                    BackgroundRemover.INSTANCE.bitmapForProcessing(
-                            bmap,
-                            true,
-                            new OnBackgroundChangeListener() {
-                                @Override
-                                public void onSuccess(@NonNull Bitmap bitmap) {
-                                    image.setImageBitmap(bitmap);
-                                }
+                Bitmap bmap = drawableToBitmap(image.getDrawable(), imageSize);
+                bmap = Bitmap.createScaledBitmap(bmap, imageSize, imageSize, false);
 
-                                @Override
-                                public void onFailed(@NonNull Exception exception) {
+                BackgroundRemover.INSTANCE.bitmapForProcessing(
+                        bmap,
+                        true,
+                        new OnBackgroundChangeListener() {
+                            @Override
+                            public void onSuccess(@NonNull Bitmap bitmap) {
+                                image.setImageBitmap(bitmap);
+                            }
 
-                                    Toast.makeText(requireContext(), "Error Occur", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                            @Override
+                            public void onFailed(@NonNull Exception exception) {
+                                Toast.makeText(requireContext(), "Error Occur", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                 //int dimension = Math.min(bmap.getWidth(), bmap.getHeight());
 
             });
 
             btnDeteksi.setOnClickListener(v->{
-                //image.invalidate();
+                image.invalidate();
+                //DrawableKt.toBitmap(image);
                 image.buildDrawingCache();
                 Bitmap bitmap = image.getDrawingCache();
                if (bitmap != null) {
@@ -343,6 +346,29 @@ public class GaleriFragment extends Fragment implements imageIndicatorListener{
             return view == ((View) object);
         }
     }
+    public static Bitmap drawableToBitmap(Drawable drawable, int imageSize) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        }
+
+        // We ask for the bounds if they have been set as they would be most
+        // correct, then we check we are  > 0
+        final int width = !drawable.getBounds().isEmpty() ?
+                drawable.getBounds().width() : drawable.getIntrinsicWidth();
+
+        final int height = !drawable.getBounds().isEmpty() ?
+                drawable.getBounds().height() : drawable.getIntrinsicHeight();
+
+        // Now we check we are > 0
+        Bitmap bitmap = Bitmap.createBitmap(width <= 0 ? 1 : width, height <= 0 ? 1 : height,  Bitmap.Config.ARGB_8888);
+        bitmap = Bitmap.createScaledBitmap(bitmap, imageSize, imageSize, false);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
+
     public  void classifyImage(Bitmap image){
         try {
             Model model = Model.newInstance(requireContext());

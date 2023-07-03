@@ -55,6 +55,10 @@
             android:theme="@style/AppTheme"
             android:exported="true"
             android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"/>
+        <activity android:name=".TesActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"/>
         <activity android:name=".ArtikelActivity"
             android:theme="@style/AppTheme"
             android:exported="true"

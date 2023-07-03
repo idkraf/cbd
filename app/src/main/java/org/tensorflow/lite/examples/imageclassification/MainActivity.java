@@ -57,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateToGaleri(){
-        Intent move = new Intent(this, GalleryActivity.class);
+        //Intent move = new Intent(this, GalleryActivity.class);
+        Intent move = new Intent(this, TesActivity.class);
         //Intent move = new Intent(this, GaleriActivity.class);
         startActivity(move);
     }
